@@ -18,32 +18,31 @@ let gameScore = 0;
 let appleIndex = 0;
 
 let startInterval;
-let intervalTime = 1200;
-let speed = 0.95;
+let intervalTime = 1000;
+let speed = 0.9;
 
 createGrid();
 
 currentSnake.forEach((index) => squares[index].classList.add("snake"));
 
 function startGame() {
-  currentSnake.forEach((index) => squares[index].classList.remove("snake"));
-
-  squares[appleIndex].classList.remove("apple");
-
+  // stop game
   clearInterval(startInterval);
 
+  // clear grid
+  currentSnake.forEach((index) => squares[index].classList.remove("snake"));
+  squares[appleIndex].classList.remove("apple");
+
+  // reset variables
+  currentSnake = [2, 1, 0];
   gameScore = 0;
   score.textContent = gameScore;
-
-  currentSnake = [2, 1, 0];
-
   direction = 1;
+  intervalTime = 1000;
 
-  intervalTime = 1200;
-
+  // start game
   generateApple();
   currentSnake.forEach((index) => squares[index].classList.add("snake"));
-
   startInterval = setInterval(moveSnake, intervalTime);
 }
 
@@ -66,7 +65,7 @@ function moveSnake() {
   )
     return clearInterval(startInterval);
 
-  // reduce snake length
+  // remove snake tail
   const tail = currentSnake.pop();
   squares[tail].classList.remove("snake");
 
@@ -76,18 +75,25 @@ function moveSnake() {
   // when snake eats apple
   if (squares[currentSnake[0]].classList.contains("apple")) {
     squares[currentSnake[0]].classList.remove("apple");
+    // add to snake
     currentSnake.push(tail);
     gameScore += 5;
-    score.textContent = gameScore;
-    intervalTime = intervalTime * speed;
-    startInterval = setInterval(moveSnake, intervalTime);
     generateApple();
+    score.textContent = gameScore;
+
+    // change snake speed
+    clearInterval(startInterval);
+    intervalTime = intervalTime * speed;
+    // to keep the minimum speed at 100ms
+    if (intervalTime <= 100) {
+      intervalTime = 100;
+    }
+    startInterval = setInterval(moveSnake, intervalTime);
   }
 
   // add to snake head on page
   squares[currentSnake[0]].classList.add("snake");
 }
-
 // end of moveSnake function
 
 function generateApple() {
@@ -99,16 +105,12 @@ function generateApple() {
 
 function controlSnake(e) {
   if (e.keyCode === 37) {
-    console.log("left pressed");
     left();
   } else if (e.keyCode === 38) {
-    console.log("up pressed");
     up();
   } else if (e.keyCode === 39) {
-    console.log("right pressed");
     right();
   } else if (e.keyCode === 40) {
-    console.log("down pressed");
     down();
   }
 }
